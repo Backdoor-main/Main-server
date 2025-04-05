@@ -1,0 +1,66 @@
+# Koyeb configuration for Backdoor AI Learning Server
+service:
+  name: backdoor-ai-learning
+  
+  ports:
+    - port: 10000
+      protocol: http
+  
+  routes:
+    - path: /
+      protocol: http
+  
+  instances: 1  # Adjust based on your scaling needs
+  
+  regions:
+    - fra  # Frankfurt, change to your preferred region
+  
+  health:
+    path: /health
+    timeout: 10s
+    interval: 30s
+    initial_delay: 30s
+  
+  definition:
+    type: docker
+    resources:
+      cpu: 0.5      # Increased CPU for scikit-learn
+      memory: 1G    # Increased RAM for scikit-learn
+      volumes:
+        - mount_path: /tmp
+          type: ephemeral
+          size: 1G
+    
+    env:
+      - name: PORT
+        value: "10000"
+      - name: PYTHON_VERSION
+        value: "3.11.11"
+      - name: DROPBOX_ENABLED
+        value: "true"
+      # DROPBOX_API_KEY is now hardcoded in config.py - no need to set it as a secret
+      - name: DROPBOX_DB_FILENAME
+        value: "backdoor_ai_db.db" 
+      - name: DROPBOX_MODELS_FOLDER
+        value: "backdoor_models"
+      - name: STORAGE_MODE
+        value: "dropbox"
+      - name: KOYEB_DEPLOYMENT
+        value: "true"
+      - name: GUNICORN_WORKERS
+        value: "2"
+      - name: MEMORY_OPTIMIZED
+        value: "true"
+      - name: NLTK_DATA_DIR
+        value: "/tmp/nltk_data"
+      - name: DATA_DIR
+        value: "/tmp/data"
+      - name: MODELS_DIR
+        value: "/tmp/models"
+    
+    # Build using Dockerfile (preferred)
+    docker:
+      dockerfile: Dockerfile
+      volumes:
+        - mount_path: /app
+          type: ephemeral
