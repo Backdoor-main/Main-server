@@ -13,10 +13,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Clean repository except README
+      - name: Clean repository
         run: |
-          mkdir temp
-          mv README.md temp/  # Add this line to preserve README
           rm -rf ./*
-          mv temp/README.md ./
-          rm -rf temp
