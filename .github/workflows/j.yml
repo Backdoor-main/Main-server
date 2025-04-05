@@ -1,22 +1,38 @@
-name: Run Curl Command
+name: Dropbox Token Refresh
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
-  run-curl:
+  refresh-token:
     runs-on: ubuntu-latest
-
+    
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
-    - name: Run Curl Command
-      run: |
-        curl https://api.dropboxapi.com/oauth2/token \
-          -d code=<AUTH_CODE> \
-          -d grant_type=authorization_code \
-          -d client_id=2b142xpdx3x9g62 \
-          -d client_secret=j3yx0b41qdvfu86 \
-          -d redirect_uri=<https://backdoor-ai-b3k3.onrender.com/oauth/dropbox/callback> \
-          -v
+      - uses: actions/checkout@v4
+      
+      - name: Refresh Dropbox Token
+        run: |
+          response=$(curl -X POST https://api.dropbox.com/oauth2/token \
+            -d "grant_type=refresh_token" \
+            -d "refresh_token=wsfCb2ZiA0gAAAAAAAAAWWB_h-x_t1-NLHGT3_nsnew" \
+            -u "2bi422xpd3xd962:j3yx0b41qdvfu86" \
+            --silent --show-error)
+          
+          # Check if curl was successful
+          if [ $? -eq 0 ]; then
+            echo "Token refresh successful"
+            echo "$response" > token_response.json
+          else
+            echo "Token refresh failed"
+            exit 1
+          fi
+      
+      - name: Commit response
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add token_response.json
+          git commit -m "Update Dropbox token response" || echo "No changes to commit"
+          git push
