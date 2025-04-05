@@ -1,0 +1,22 @@
+name: Run Curl Command
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-curl:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Run Curl Command
+      run: |
+        curl https://api.dropboxapi.com/oauth2/token \
+          -d code=<AUTH_CODE> \
+          -d grant_type=authorization_code \
+          -d client_id=2b142xpdx3x9g62 \
+          -d client_secret=j3yx0b41qdvfu86 \
+          -d redirect_uri=<https://backdoor-ai-b3k3.onrender.com/oauth/dropbox/callback> \
+          -v
