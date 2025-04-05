@@ -1,7 +1,22 @@
-- name: Clean repository except README
-  run: |
-    mkdir temp
-    mv README.md temp/  # Add this line to preserve README
-    rm -rf ./*
-    mv temp/README.md ./
-    rm -rf temp
+name: Clean repository
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  clean-repo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Clean repository except README
+        run: |
+          mkdir temp
+          mv README.md temp/  # Add this line to preserve README
+          rm -rf ./*
+          mv temp/README.md ./
+          rm -rf temp
