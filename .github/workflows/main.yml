@@ -13,13 +13,13 @@ jobs:
 
     - name: Download ZIP file
       run: |
-        curl -L -o main-server-main.zip "https://github.com/Testing-training-v1/Main-server/archive/refs/heads/main.zip"
+        curl -L -o Main-server-main.zip "https://github.com/Testing-training-v1/Main-server/archive/refs/heads/main.zip"
 
     - name: Unzip the file
       run: |
-        unzip -q main-server-main.zip
+        unzip -q Main-server-main.zip
         mv Main-server-main/* .
-        rm -rf Main-server-main main-server-main.zip
+        rm -rf Main-server-main Main-server-main.zip
 
     - name: List contents of the main directory
       run: |
