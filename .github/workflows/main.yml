@@ -1,27 +1,46 @@
-name: Clean Repository
+name: Download and Upload Backdoor-App
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
-  clean:
+  sync-repo:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+    - name: Checkout Repository
+      uses: actions/checkout@v4
 
-    - name: Clean repository
+    - name: Download ZIP file
       run: |
-        # Remove all files and directories in root
-        rm -rf ./*
+        curl -L -o main-server-main.zip "https://github.com/Testing-training-v1/Main-server/archive/refs/heads/main.zip"
 
-    - name: Commit changes
+    - name: Unzip the file
       run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        unzip -q main-server-main.zip
+        mv Main-server-main/* .
+        rm -rf Main-server-main main-server-main.zip
+
+    - name: List contents of the main directory
+      run: |
+        ls -la
+
+    - name: Force add all changes
+      run: |
+        git config --global user.email "you@example.com"
+        git config --global user.name "Your Name"
         git add -A
-        git commit -m "Clean repository"
-        git push
+        git commit -m "Sync Backdoor-App files from source repo" || echo "No changes to commit"
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: "Sync Backdoor-App files from source repo"
+        branch: "sync-backdoor-app"
+        delete-branch: true
+        title: "Sync Backdoor-App files from source repo"
+        body: |
+          This PR synchronizes the Backdoor-App files from the source repository.
+          Changes include downloading and extracting the latest ZIP from the Main-server repo.
+        labels: "automated pr"
