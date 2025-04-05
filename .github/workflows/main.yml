@@ -1,0 +1,39 @@
+name: Clean Repository
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Clean repository except workflows
+      run: |
+        # Create a temporary directory
+        mkdir temp
+        
+        # Move workflow files to temp directory
+        mv .github/workflows temp/
+        
+        # Remove all files and directories in root
+        rm -rf ./*
+        
+        # Move workflow files back
+        mv temp/workflows .github/
+        
+        # Remove temp directory
+        rm -rf temp
+
+    - name: Commit changes
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add -A
+        git commit -m "Clean repository - keep only workflow files"
+        git push
