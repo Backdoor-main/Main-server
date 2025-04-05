@@ -1,4 +1,4 @@
-name: Download and Upload Backdoor-App
+name: Sync Backdoor-App
 
 on:
   workflow_dispatch: # Allows manual triggering of the workflow
