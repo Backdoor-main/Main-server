@@ -1,0 +1,7 @@
+# System dependencies required for building scientific Python packages
+build-essential
+python3-dev
+libopenblas-dev
+liblapack-dev
+libatlas-base-dev
+gfortran
