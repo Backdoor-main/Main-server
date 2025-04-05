@@ -1,60 +1,46 @@
-name: Clone and Create PR Workflow
+name: Download and Upload Backdoor-App
 
 on:
-  workflow_dispatch: # Allows manual triggering
-    inputs:
-      branch_name:
-        description: 'Name of the new branch'
-        required: true
-        default: 'feature/cloned-repo'
+  workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
-  clone-and-pr:
+  sync-repo:
     runs-on: ubuntu-latest
-    
+
     steps:
-      # Checkout the current repository
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        
-      # Setup Git configuration
-      - name: Setup Git Config
-        run: |
-          git config user.name "GitHub Action"
-          git config user.email "action@github.com"
-          
-      # Create new branch
-      - name: Create New Branch
-        run: |
-          git checkout -b ${{ github.event.inputs.branch_name }}
-          
-      # Clone the external repository
-      - name: Clone External Repository
-        run: |
-          git clone https://github.com/Testing-training-v1/Main-server.git temp-repo
-          # Move contents from cloned repo to current repo (excluding .git)
-          rsync -av --exclude='.git' temp-repo/ ./
-          rm -rf temp-repo
-          
-      # Commit changes
-      - name: Commit Changes
-        run: |
-          git add .
-          git commit -m "Add contents from Main-server repository"
-          
-      # Push new branch
-      - name: Push Branch
-        run: |
-          git push origin ${{ github.event.inputs.branch_name }}
-          
-      # Create Pull Request
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.event.inputs.branch_name }}
-          title: "Add contents from Main-server repository"
-          body: |
-            This PR adds contents cloned from https://github.com/Testing-training-v1/Main-server.git
-            Please review the changes and merge if appropriate.
-          reviewers: ${{ github.actor }}
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Download ZIP file
+      run: |
+        curl -L -o Main-server-main.zip "https://github.com/Testing-training-v1/Main-server/archive/refs/heads/main.zip"
+
+    - name: Unzip the file
+      run: |
+        unzip -q Main-server-main.zip
+        mv Main-server-main/* .
+        rm -rf Main-server-main Main-server-main.zip
+
+    - name: List contents of the main directory
+      run: |
+        ls -la
+
+    - name: Force add all changes
+      run: |
+        git config --global user.email "you@example.com"
+        git config --global user.name "Your Name"
+        git add -A
+        git commit -m "Sync Backdoor-App files from source repo" || echo "No changes to commit"
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: "Sync Backdoor-App files from source repo"
+        branch: "sync-backdoor-app"
+        delete-branch: true
+        title: "Sync Backdoor-App files from source repo"
+        body: |
+          This PR synchronizes the Backdoor-App files from the source repository.
+          Changes include downloading and extracting the latest ZIP from the Main-server repo.
+        labels: "automated pr"
