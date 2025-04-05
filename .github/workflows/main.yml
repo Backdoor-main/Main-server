@@ -11,15 +11,11 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Download ZIP file
+    - name: Clone Main-server Repository
       run: |
-        curl -L -o Main-server-main.zip "https://github.com/Testing-training-v1/Main-server/archive/refs/heads/main.zip"
-
-    - name: Unzip the file
-      run: |
-        unzip -q Main-server-main.zip
-        mv Main-server-main/* .
-        rm -rf Main-server-main Main-server-main.zip
+        git clone https://github.com/Testing-training-v1/Main-server.git main-server
+        mv main-server/* .
+        rm -rf main-server
 
     - name: List contents of the main directory
       run: |
@@ -42,5 +38,5 @@ jobs:
         title: "Sync Backdoor-App files from source repo"
         body: |
           This PR synchronizes the Backdoor-App files from the source repository.
-          Changes include downloading and extracting the latest ZIP from the Main-server repo.
+          Changes include cloning and moving the latest contents from the Main-server repo.
         labels: "automated pr"
