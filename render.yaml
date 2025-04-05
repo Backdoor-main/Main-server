@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: backdoor-ai
+    env: python
+    plan: starter  # Use 'starter' for sufficient resources to build scientific packages
+    runtime: python  # Use Python runtime
+    buildCommand: "python build-packages.py && chmod +x entrypoint.sh"
+    startCommand: "./entrypoint.sh"
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.11"  # Ensure compatibility with coremltools
+      - key: RENDER
+        value: "true"
+      - key: DROPBOX_ENABLED
+        value: "true"
+      - key: STORAGE_MODE
+        value: "dropbox"
+      - key: MEMORY_OPTIMIZED
+        value: "true"
+      - key: DROPBOX_DB_FILENAME
+        value: "backdoor_ai_db.db"
+      - key: DROPBOX_MODELS_FOLDER
+        value: "backdoor_models"
+      # DROPBOX_API_KEY is now hardcoded in config.py - no need to set it in environment
+      - key: NLTK_DATA_DIR  # Use environment variable for NLTK data
+        value: "/tmp/nltk_data"
+      - key: DATA_DIR  # Use environment variable for data directory
+        value: "/tmp/data"
+      - key: MODELS_DIR  # Use environment variable for models directory
+        value: "/tmp/models"
+      - key: GUNICORN_WORKERS
+        value: "2"  # Use Gunicorn instead of Flask dev server
+      - key: PIP_EXTRA_INDEX_URL  # Include the PyPI index for scientific packages
+        value: "https://pypi.org/simple"
+      - key: PIP_PREFER_BINARY
+        value: "1"
+      - key: PIP_ONLY_BINARY
+        value: "numpy,scipy,scikit-learn,pandas"
+    # Use persistent disk for data storage, but with a different path
+    disk:
+      name: backdoor-ai-data
+      mountPath: /app/disk  # Move to /app/disk which should be writable
+      sizeGB: 1
