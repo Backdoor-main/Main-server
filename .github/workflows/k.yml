@@ -1,9 +1,7 @@
 name: Clean Repository
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   clean:
