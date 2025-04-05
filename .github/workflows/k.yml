@@ -1,10 +1,7 @@
-    - name: Clean repository except workflows and README
-      run: |
-        mkdir temp
-        mv .github/workflows temp/
-        mv README.md temp/  # Add this line to preserve README
-        rm -rf ./*
-        mv temp/workflows .github/
-        mv temp/README.md ./
-        rm -rf temp
-``` ​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
+- name: Clean repository except README
+  run: |
+    mkdir temp
+    mv README.md temp/  # Add this line to preserve README
+    rm -rf ./*
+    mv temp/README.md ./
+    rm -rf temp
